@@ -46,7 +46,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="info"/>
+    <logger name="org.springframework" level="all"/>
     <logger name="org.apache" level="error"/>
 
     <root level="debug">

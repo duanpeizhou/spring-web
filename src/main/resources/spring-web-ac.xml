@@ -1,16 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvn="http://www.springframework.org/schema/mvc"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 ">
 
-    <mvn:annotation-driven/>
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="objectMapper"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+          p:indentOutput="true"
+          p:simpleDateFormat="yyyy-MM-dd HH:mm:ss"
+          p:modulesToInstall="com.fasterxml.jackson.module.paramnames.ParameterNamesModule">
+        <property name="serializers">
+            <array>
+                <bean class="com.bluelemontree.depth.serializers.CustomerLocalDateTimeSerializer"/>
+            </array>
+        </property>
+        <property name="deserializers">
+            <array>
+                <bean class="com.bluelemontree.depth.deserializers.CustomerLocalDateTimeDeserializer"/>
+            </array>
+        </property>
+    </bean>
+
     <context:annotation-config/>
-    <context:component-scan base-package="com.bluelemontree.depth.web"/>
+    <context:component-scan base-package="com.bluelemontree.depth"/>
 
     <bean id="/index.do" class="com.bluelemontree.depth.web.BeanNameUrlController"/>
 

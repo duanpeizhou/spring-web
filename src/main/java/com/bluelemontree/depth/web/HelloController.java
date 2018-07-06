@@ -1,11 +1,10 @@
 package com.bluelemontree.depth.web;
 
+import com.bluelemontree.depth.param.SaveHello;
 import com.bluelemontree.depth.service.HelloService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -31,6 +30,13 @@ public class HelloController {
         return helloService.hello();
     }
 
+    @ResponseBody
+    @PostMapping("/save")
+    public SaveHello save(@RequestBody SaveHello saveHello) {
+        logger.info("save hello = {}", saveHello);
+        logger.info("save hello.bigData = {}",saveHello.getBigData().isPresent());
+        return saveHello;
+    }
 
     @PostConstruct
     public void init() {
