@@ -2,7 +2,9 @@ package com.bluelemontree.depth.web;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.springframework.util.ClassUtils;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 
 /**
@@ -41,5 +43,22 @@ public class TestLogger {
         }
 
     }
+
+    @Test
+    public void testMethod() throws NoSuchMethodException {
+        Method[] methods = TestLogger.class.getMethods();
+        for (Method method : methods) {
+            int length = method.getParameterTypes().length;
+            System.out.println(length);
+        }
+    }
+
+    @Test
+    public void testClassForName() {
+        boolean present = ClassUtils.isPresent("com.bluelemontree.depth.web.SerializationExample", TestLogger.class.getClassLoader());
+        System.out.println(present);
+
+    }
+
 
 }

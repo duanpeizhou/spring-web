@@ -11,8 +11,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -29,7 +33,7 @@ public class SerializationExample {
         String dateFormatter = LocalDateTime.now().format(formatter);
         System.out.println(dateFormatter);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = test();
         Album album = new Album("Kind Of Blue");
         album.setLinks(new String[]{"link1", "link2"});
         List songs = new ArrayList();
@@ -51,10 +55,11 @@ public class SerializationExample {
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
         mapper.setDateFormat(outputFormat);
 
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(formatter);
-        javaTimeModule.addSerializer(LocalDateTime.class, serializer);
-        mapper.registerModule(javaTimeModule);
+//        JavaTimeModule javaTimeModule = new JavaTimeModule();
+//        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(formatter);
+//        javaTimeModule.addSerializer(LocalDateTime.class, serializer);
+//        mapper.registerModule(javaTimeModule);
+
 
 
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategy() {
@@ -75,6 +80,26 @@ public class SerializationExample {
         mapper.setSerializationInclusion(Include.NON_EMPTY);
         mapper.writeValue(System.out, album);
     }
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static ObjectMapper test() {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
+                .modulesToInstall(new ParameterNamesModule());
+
+        ObjectMapper mapper = builder.build();
+//        ObjectMapper mapper = new ObjectMapper();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(formatter);
+        LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(formatter);
+        javaTimeModule.addSerializer(LocalDateTime.class, serializer);
+        javaTimeModule.addDeserializer(LocalDateTime.class, deserializer);
+        mapper.registerModule(javaTimeModule);
+        mapper.registerModule(new Jdk8Module());
+        mapper.registerModule(new ParameterNamesModule());
+        return mapper;
+    }
+
 }
 
 class Album {

@@ -17,6 +17,8 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <!--<mvc:resources mapping="/resource/**" location="/resource/"/>-->
+
     <bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
           p:indentOutput="true"
           p:simpleDateFormat="yyyy-MM-dd HH:mm:ss"
@@ -36,6 +38,36 @@
     <context:annotation-config/>
     <context:component-scan base-package="com.bluelemontree.depth"/>
 
+    <!-- 配置freeMarker的模板路径 -->
+    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="WEB-INF/templates/" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+    <!-- freemarker视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="suffix" value=".ftl" />
+        <property name="contentType" value="text/html;charset=UTF-8" />
+        <!-- 此变量值为pageContext.request, 页面使用方法：rc.contextPath -->
+        <property name="requestContextAttribute" value="rc" />
+    </bean>
+
+
     <bean id="/index.do" class="com.bluelemontree.depth.web.BeanNameUrlController"/>
+
+    <bean id="simpleUrlOneController" class="com.bluelemontree.depth.web.SimpleUrlOneController"/>
+
+    <bean id="urlFilenameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+
+    <bean id="resourceHttpRequestHandler" class="org.springframework.web.servlet.resource.ResourceHttpRequestHandler" p:locations="/resource/"/>
+
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/simple1" value-ref="simpleUrlOneController"/>
+                <entry key="/a/*.html" value-ref="urlFilenameViewController"/>
+                <entry key="/resource/**" value-ref="resourceHttpRequestHandler"/>
+            </map>
+        </property>
+    </bean>
 
 </beans>
